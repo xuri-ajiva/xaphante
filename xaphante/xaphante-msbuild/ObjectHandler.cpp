@@ -1,4 +1,5 @@
-#include "ObjectHandler.h"
+#include "ObjectHandler.h"	 
+#include <GL/glew.h>
 
 ObjectHandler::ObjectHandler() {
 	VERTICES_[0] = Vertex {

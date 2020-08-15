@@ -1,4 +1,5 @@
-#include "SceneHandler.h"
+#include "SceneHandler.h"	   
+#include <GL/glew.h>
 
 SceneHandler::SceneHandler() {
 	objects = new std::vector<ObjectHandler*>();

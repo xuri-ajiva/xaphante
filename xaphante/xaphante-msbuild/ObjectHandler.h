@@ -1,6 +1,6 @@
 #pragma once
 #include "ShaderHandler.h"
-#include "vertexBuffer.h"
+#include "VertexBuffer.h"
 #include "_defines.h"
 
 class ObjectHandler {

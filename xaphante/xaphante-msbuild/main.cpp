@@ -7,8 +7,6 @@
 #include <SDL.h>
 
 #include "SceneHandler.h"
-#include "ShaderHandler.h"
-#include "vertexBuffer.h"
 #include "WindowWrapper.h"
 
 #pragma comment(lib, "SDL2.lib")

@@ -1,4 +1,5 @@
-#include "VertexBuffer.h"
+#include "VertexBuffer.h"	  
+#include <GL/glew.h>
 
 VertexBuffer::VertexBuffer(void* data, UInt32 num_vertices) {
 	glGenVertexArrays(1, &VAO_);
