@@ -1,4 +1,6 @@
 #include "VertexBuffer.h"	  
+
+#include <cstddef>
 #include <GL/glew.h>
 
 VertexBuffer::VertexBuffer(void* data, UInt32 num_vertices) {

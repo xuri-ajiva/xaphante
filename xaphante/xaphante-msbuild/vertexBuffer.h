@@ -4,6 +4,8 @@
 #include "_defines.h"
 
 struct VertexBuffer {
+    
+public:
     VertexBuffer(void* data, UInt32 num_vertices);
 
     virtual ~VertexBuffer();

@@ -1,15 +1,26 @@
-#pragma once
-#include <cstdio>
+
 #include <iostream>
 #include <SDL.h>
+#include <string>
 #include <GL/glew.h>
+
+
+#include "_defines.h"
 
 class WindowWrapper {
 	SDL_Window*   window;
 	SDL_GLContext gl_context;
 	SDL_version   compiled;
 	SDL_version   linked;
+	UInt64        PERF_COUNTER_FREQUENCY_ = SDL_GetPerformanceFrequency();
+	UInt64        lastCounter             = SDL_GetPerformanceCounter();
+	std::string   staticTitle             = "xaphante-game-engine";
+	Float32       secondProcess           = 0.0f;
+
+	Float32 updateFps = .1;
 public:
+	Float32 delta = 0.0f;
+
 	int Init() {
 		SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -20,8 +31,17 @@ public:
 		SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-		window = SDL_CreateWindow("xaphante-game-engin", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 1200, 800,
+
+#ifdef _DEBUG
+		std::cout << "[DEBUG] Enabled" << std::endl;
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+#else
+
+#endif
+
+		window = SDL_CreateWindow(staticTitle.c_str(), SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 1200, 800,
 		                          SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
 		gl_context = SDL_GL_CreateContext(window);
 
 		const auto err = glewInit();
@@ -46,6 +66,7 @@ public:
 			       linked.major, linked.minor, linked.patch);
 		}
 
+		SDL_GL_SetSwapInterval(1);
 		return 0;
 	}
 
@@ -55,7 +76,7 @@ public:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	bool EndLoop() const {
+	bool EndLoop() {
 		SDL_GL_SwapWindow(window);
 
 		SDL_Event event;
@@ -65,6 +86,20 @@ public:
 			}
 		}
 
+		const auto endCounter     = SDL_GetPerformanceCounter();
+		const auto counterElapsed = endCounter - lastCounter;
+		delta                     = Float32(counterElapsed) / Float32(PERF_COUNTER_FREQUENCY_);
+		secondProcess += delta;
+
+		if (secondProcess > updateFps) {
+			secondProcess -= updateFps;
+			auto FPS = UInt32(Float32(PERF_COUNTER_FREQUENCY_) / Float32(counterElapsed));
+
+
+			SDL_SetWindowTitle(window, (staticTitle + " FPS: " + std::to_string(FPS)).c_str());
+		}
+
+		lastCounter = endCounter;
 		return true;
 	}
 
