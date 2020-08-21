@@ -1,9 +1,7 @@
-
 #include <iostream>
 #include <SDL.h>
 #include <string>
 #include <GL/glew.h>
-
 
 #include "_defines.h"
 
@@ -70,10 +68,9 @@ public:
 		return 0;
 	}
 
-	void BeginLoop() {
-
-		glClearColor(.1f, .1f, .1f, .1f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	static void BeginLoop() {
+		glClearColor(.1f, .1f, .1f, .1f)GL_ERROR
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)GL_ERROR
 	}
 
 	bool EndLoop() {
