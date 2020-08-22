@@ -1,6 +1,6 @@
 #pragma once
 #include "_defines.h"
-#include "../libs/stb_image.h"
+#include "stb_image.h"
 
 class TextureHandler {
 	Int32  textureWidth  = 0;
@@ -32,7 +32,12 @@ public:
 			glUniform1i(textureUniformLocation, 0);
 		}
 	}
-
+	
+	~TextureHandler()
+	{
+	   glDeleteTextures(1, &TEXTURE_ID_);
+	}
+	
 	void Bind() const {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TEXTURE_ID_);
