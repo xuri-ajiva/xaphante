@@ -1,6 +1,8 @@
 #include "ObjectHandler.h"
 #include <GL/glew.h>
 
+#include "glm/glm.hpp"
+
 #include "Scene.h"
 
 ObjectHandler::ObjectHandler() {
@@ -24,6 +26,7 @@ ObjectHandler::ObjectHandler() {
 		0, 1,
 		0.0f, 0.0f, 1.0f, 1.0f
 	};
+	
 }
 
 void ObjectHandler::Init(std::string* sceneLocation, ShaderHandler* shader) {
@@ -37,6 +40,13 @@ void ObjectHandler::Init(std::string* sceneLocation, ShaderHandler* shader) {
 	TextureHandler::Unbind();
 }
 
+
+void ObjectHandler::CleanUp(SceneCollection* node) {
+	delete VERTEX_BUFFER_;
+	delete INDEX_BUFFER_;
+	delete TEXTURE_HANDLER_;
+}
+
 void ObjectHandler::Draw(WindowWrapper* handler) const {
 	VERTEX_BUFFER_->Bind();
 	INDEX_BUFFER_->Bind();
@@ -47,4 +57,9 @@ void ObjectHandler::Draw(WindowWrapper* handler) const {
 	//VertexBuffer::Unbind();
 	//IndexBuffer::Unbind();
 	//TextureHandler::Unbind();
+}
+
+void ObjectHandler::GameLoop(SceneCollection* scene_collection) {
+	  
+	
 }

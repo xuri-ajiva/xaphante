@@ -5,6 +5,9 @@
 #include "VertexBuffer.h"
 #include "WindowWrapper.h"
 #include "_defines.h"
+#include "glm/glm.hpp"
+
+class SceneCollection;
 
 class ObjectHandler {
 	Vertex VERTICES_[4];
@@ -19,10 +22,14 @@ class ObjectHandler {
 	IndexBuffer*    INDEX_BUFFER_    = nullptr;
 	TextureHandler* TEXTURE_HANDLER_ = nullptr;
 
-public:
+public:					  	
 	ObjectHandler();
 
 	void Init(std::string* sceneLocation, ShaderHandler* shader);
 
 	void Draw(WindowWrapper* handler) const;
+
+	void CleanUp(SceneCollection* node);
+
+	void GameLoop(SceneCollection* scene_collection);
 };
