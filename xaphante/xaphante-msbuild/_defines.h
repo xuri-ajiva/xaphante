@@ -1,8 +1,9 @@
-#pragma once
+#pragma once  
 #include <cstdint>
-#include <iostream>
+#include <iostream>	
 
-#include <GL/glew.h>
+#include <GL/glew.h>  
+#include <SDL.h>
 
 
 inline void _GLGetError(const char* file, int line, const char* call) {
@@ -11,6 +12,23 @@ inline void _GLGetError(const char* file, int line, const char* call) {
 		std::cout << file << ":" << line << std::endl;
 	}
 }
+
+inline static const char* humanSize(uint64_t bytes) {
+	const char* suffix[] = {"B", "KB", "MB", "GB", "TB"};
+	char        length   = sizeof(suffix) / sizeof(suffix[0]);
+
+	int    i        = 0;
+	double dblBytes = bytes;
+
+	if (bytes > 1024) {
+		for (i = 0; (bytes / 1024) > 0 && i < length - 1; i++, bytes /= 1024) dblBytes = bytes / 1024.0;
+	}
+
+	static char output[200];
+	sprintf_s(output, "%.02lf %s", dblBytes, suffix[i]);
+	return output;
+}
+
 #ifdef _DEBUG
 	#define GL_ERROR ; _GLGetError(__FILE__, __LINE__, __func__);
 #else
