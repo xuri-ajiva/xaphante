@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ostream>
 
-ShaderHandler::ShaderHandler(const char* vertexShaderFilename, const char* fragmentShaderFilename) {
+ShaderHandler::ShaderHandler(std::string* vertexShaderFilename, std::string* fragmentShaderFilename) {
 	SHADER_ID_ = CreateShader(vertexShaderFilename, fragmentShaderFilename);
 }
 
@@ -20,9 +20,9 @@ void ShaderHandler::Unbind() {
 	glUseProgram(0);
 }
 
-GLuint ShaderHandler::Compile(std::string shaderSource, GLenum type) {
+GLuint ShaderHandler::Compile(std::string* shaderSource, GLenum type) {
 	GLuint      id  = glCreateShader(type);
-	const char* src = shaderSource.c_str();
+	const char* src = shaderSource->c_str();
 	glShaderSource(id, 1, &src, 0);
 	glCompileShader(id);
 
@@ -40,15 +40,15 @@ GLuint ShaderHandler::Compile(std::string shaderSource, GLenum type) {
 	return id;
 }
 
-std::string ShaderHandler::Parse(const char* filename) {
+std::string ShaderHandler::Parse(std::string* filename) {
 	FILE* file;
 #ifdef _WIN32
-	if (fopen_s(&file, filename, "rb") != 0) {
+	if (fopen_s(&file, filename->c_str(), "rb") != 0) {
 		std::cout << "File " << filename << " not found" << std::endl;
 		return "";
 	}
 #else
-	file = fopen(filename, "rb");
+	file = fopen(filename.c_str(), "rb");
 	if (file == nullptr) {
 		std::cout << "File " << filename << " not found" << std::endl;
 		return "";
@@ -67,13 +67,13 @@ std::string ShaderHandler::Parse(const char* filename) {
 	return contents;
 }
 
-GLuint ShaderHandler::CreateShader(const char* vertexShaderFilename, const char* fragmentShaderFilename) {
+GLuint ShaderHandler::CreateShader(std::string* vertexShaderFilename, std::string* fragmentShaderFilename) {
 	std::string vertexShaderSource   = Parse(vertexShaderFilename);
 	std::string fragmentShaderSource = Parse(fragmentShaderFilename);
 
 	GLuint program = glCreateProgram();
-	GLuint vs      = Compile(vertexShaderSource, GL_VERTEX_SHADER);
-	GLuint fs      = Compile(fragmentShaderSource, GL_FRAGMENT_SHADER);
+	GLuint vs      = Compile(&vertexShaderSource, GL_VERTEX_SHADER);
+	GLuint fs      = Compile(&fragmentShaderSource, GL_FRAGMENT_SHADER);
 
 	glAttachShader(program, vs);
 	glAttachShader(program, fs);

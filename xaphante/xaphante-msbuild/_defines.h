@@ -4,6 +4,7 @@
 
 #include <GL/glew.h>
 
+
 inline void _GLGetError(const char* file, int line, const char* call) {
 	while (GLenum error = glGetError()) {
 		std::cout << "[Gl Error(" << error << ")]: " << glewGetErrorString(error) << " in " << call << std::endl;
@@ -33,6 +34,9 @@ struct Vertex {
 	Float32 x;
 	Float32 y;
 	Float32 z;
+	
+	Float32 u;
+	Float32 v;
 
 	Float32 r;
 	Float32 g;

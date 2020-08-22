@@ -1,18 +1,19 @@
 #define  __XURI__INIT
 #define GLEW_STATIC   
-#define SDL_MAIN_HANDLED 
+#define SDL_MAIN_HANDLED
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "../libs/stb_image.h"
+#undef  STB_IMAGE_IMPLEMENTATION
+
 #pragma comment(lib, "SDL2.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
 
-#include <GL/glew.h>
-#include <SDL.h>
-
+#include "Scene.h"
 #include "_defines.h"
 
-#include "SceneHandler.h"
 #include "WindowWrapper.h"
-
 
 void GlDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
 	std::cout << "[Gl Error(" << severity << ")]: " << message << std::endl;
@@ -30,13 +31,13 @@ int main(int argc, char** argv) {
 #endif
 
 
-	auto* scene = new SceneHandler();
-	scene->Init("");
+	auto* scene = new SceneHandler(windW);
+	scene->Init(new std::string("scene/"));
 
 	do {
 		windW->BeginLoop();
 
-		scene->Draw();
+		scene->Draw(windW);
 	}
 	while (windW->EndLoop());
 

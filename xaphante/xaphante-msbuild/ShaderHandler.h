@@ -1,23 +1,28 @@
 #pragma once
-#include <string>     
+#include <string>
 #include <GL/glew.h>
 
-class ShaderHandler
-{
+class ShaderHandler {
 public:
-    ShaderHandler(const char* vertexShaderFilename, const char* fragmentShaderFilename);
-    virtual ~ShaderHandler();
+	ShaderHandler(std::string* vertexShaderFilename, std::string* fragmentShaderFilename);
 
-    void Bind();
-    void Unbind();
+	virtual ~ShaderHandler();
+
+	void Bind();
+
+	void Unbind();
+
+	GLuint GetShaderId() const {
+		return SHADER_ID_;
+	}
 
 private:
 
-    GLuint Compile(std::string shaderSource, GLenum type);
+	GLuint Compile(std::string* shaderSource, GLenum type);
 
-    static std::string Parse(const char* filename);
-    GLuint CreateShader(const char* vertexShaderFilename, const char* fragmentShaderFilename);
+	static std::string Parse(std::string* filename);
 
-    GLuint SHADER_ID_;
+	GLuint CreateShader(std::string* vertexShaderFilename, std::string* fragmentShaderFilename);
+
+	GLuint SHADER_ID_;
 };
-

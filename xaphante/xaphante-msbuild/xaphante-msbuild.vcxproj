@@ -152,16 +152,15 @@
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjectHandler.cpp" />
-    <ClCompile Include="SceneHandler.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
-    <ClCompile Include="WindowWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="ObjectHandler.h" />
-    <ClInclude Include="SceneHandler.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderHandler.h" />
+    <ClInclude Include="TextureHandler.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="WindowWrapper.h" />
     <ClInclude Include="_defines.h" />

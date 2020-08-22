@@ -1,9 +1,11 @@
+#pragma once
 #include <iostream>
 #include <SDL.h>
 #include <string>
 #include <GL/glew.h>
 
 #include "_defines.h"
+#include "../libs/stb_image.h"
 
 class WindowWrapper {
 	SDL_Window*   window;
@@ -18,6 +20,7 @@ class WindowWrapper {
 	Float32 updateFps = .1;
 public:
 	Float32 delta = 0.0f;
+	Float64 time  = 0.0f;
 
 	int Init() {
 		SDL_Init(SDL_INIT_EVERYTHING);
@@ -65,6 +68,8 @@ public:
 		}
 
 		SDL_GL_SetSwapInterval(1);
+
+		stbi_set_flip_vertically_on_load(true);
 		return 0;
 	}
 
@@ -87,6 +92,7 @@ public:
 		const auto counterElapsed = endCounter - lastCounter;
 		delta                     = Float32(counterElapsed) / Float32(PERF_COUNTER_FREQUENCY_);
 		secondProcess += delta;
+		time += delta;
 
 		if (secondProcess > updateFps) {
 			secondProcess -= updateFps;
