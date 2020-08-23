@@ -16,6 +16,7 @@
 
 
 int main(int argc, char** argv) {
+    std::cout << "XAPHANTE-ENGINE" << std::endl; 
 	auto game = new GameHandler();
 	game->Init();
 
