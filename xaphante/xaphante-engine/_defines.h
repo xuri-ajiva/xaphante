@@ -1,4 +1,5 @@
 #pragma once  
+#include <bitset>
 #include <cstdint>
 #include <iostream>	
 
@@ -44,6 +45,7 @@ typedef uint8_t  UInt8;
 typedef uint16_t UInt16;
 typedef uint32_t UInt32;
 typedef uint64_t UInt64;
+typedef std::bitset<8> Byte;
 
 typedef float  Float32;
 typedef double Float64;

@@ -2,9 +2,14 @@
 #include <SDL.h>
 #include <string>
 
-#include "_defines.h"
+#include "_defines.h" 
 class SceneHandler;
+class SceneCollection;	
 class WindowWrapper;
+
+#include "SceneHandler.h"
+#include "SceneCollection.h"
+#include "WindowWrapper.h"
 
 class GameHandler {
 	SceneHandler*  scene {};
