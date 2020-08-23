@@ -1,0 +1,41 @@
+﻿<Window x:Class="xaphante_model_exporter_interface.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:xaphante_model_exporter_interface"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="357" Width="471" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{DynamicResource GridBackground1}" Foreground="#FF1A7DFB">
+    <Window.Resources>
+        <LinearGradientBrush x:Key="GridBackground1" EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#FF032B53"/>
+            <GradientStop Color="#FF0E0E2E" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Resources>
+    <Grid>
+        <Grid Height="230" VerticalAlignment="Top">
+            <Button Content="Select" Height="25" Margin="0,10,69,0" VerticalAlignment="Top" Click="OpenInput" FontWeight="Normal" Background="{x:Null}" HorizontalAlignment="Right" Width="57" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False" BorderThickness="1,1,1,1"/>
+            <TextBox x:Name="inputLBox" Height="25" Margin="67,10,131,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Normal" Background="{x:Null}" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False"/>
+            <Button Content="Select" Height="25" Margin="0,39,69,0" VerticalAlignment="Top" Click="OpenOutput" FontWeight="Normal" Background="{x:Null}" HorizontalAlignment="Right" Width="57" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False" BorderThickness="1,1,1,1"/>
+            <TextBox x:Name="outputLBox" Height="25" Margin="67,39,131,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Normal" TextAlignment="Justify" Background="{x:Null}" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False"/>
+            <Label Content="Input" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="52" Margin="10,10,0,0" FontWeight="Normal" Background="{x:Null}" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="4,3,5,1" UseLayoutRounding="False"/>
+            <Label Content="Output" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="52" Margin="10,39,0,0" FontWeight="Normal" Background="{x:Null}" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="4,3,5,1" UseLayoutRounding="False"/>
+            <Button Content="Show" Height="25" Margin="0,39,7,0" VerticalAlignment="Top" Click="ShowOutput" FontWeight="Normal" Background="{x:Null}" HorizontalAlignment="Right" Width="57" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False" BorderThickness="1,1,1,1"/>
+            <Button Content="Progress" HorizontalAlignment="Left" Margin="10,0,0,10" Width="117" Click="Progress" Background="{x:Null}" Height="30" VerticalAlignment="Bottom" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False" BorderThickness="1,1,1,1"/>
+            <Button Content="Abort" HorizontalAlignment="Left" Margin="132,0,0,10" Width="117" Click="Abort" Background="{x:Null}" Height="30" VerticalAlignment="Bottom" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False" BorderThickness="1,1,1,1"/>
+            <Button Content="Show" Height="25" Margin="0,10,7,0" VerticalAlignment="Top" Click="ShowInput" FontWeight="Normal" Background="{x:Null}" HorizontalAlignment="Right" Width="57" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False" BorderThickness="1,1,1,1"/>
+        </Grid>
+        <Grid Margin="10,235,10,10">
+            <TextBox x:Name="status" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"  Margin="0,19,0,1" HorizontalScrollBarVisibility="Auto" Background="{x:Null}" SelectionBrush="#FF0073FB" Foreground="#FFFF7400" BorderBrush="#FF005DFF" BorderThickness="1,1,1,1"/>
+            <ProgressBar x:Name="progBar" Height="14" VerticalAlignment="Top" Orientation="Horizontal" Maximum="1000" Background="{x:Null}" BorderBrush="#FF005DFF">
+                <ProgressBar.Foreground>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF8D2000" Offset="1"/>
+                        <GradientStop Color="#FFFF7400" Offset="0"/>
+                    </LinearGradientBrush>
+                </ProgressBar.Foreground>
+            </ProgressBar>
+        </Grid>
+
+    </Grid>
+</Window>

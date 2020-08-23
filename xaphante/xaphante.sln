@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xaphante-msbuild", "xaphante-msbuild\xaphante-msbuild.vcxproj", "{E09A62A8-2B61-4841-AE49-751AC92D5048}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xaphante-model-exporter-lib", "xaphante-model-exporter-lib\xaphante-model-exporter-lib.csproj", "{DED619A6-64DF-4689-A652-34B0B5EBD4D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xaphante-model-exporter-interface", "xaphante-model-exporter-interface\xaphante-model-exporter-interface.csproj", "{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xaphante-engine", "xaphante-engine\xaphante-engine.vcxproj", "{E09A62A8-2B61-4841-AE49-751AC92D5048}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,22 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DED619A6-64DF-4689-A652-34B0B5EBD4D6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DED619A6-64DF-4689-A652-34B0B5EBD4D6}.Debug|x64.Build.0 = Debug|Any CPU
+		{DED619A6-64DF-4689-A652-34B0B5EBD4D6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DED619A6-64DF-4689-A652-34B0B5EBD4D6}.Debug|x86.Build.0 = Debug|Any CPU
+		{DED619A6-64DF-4689-A652-34B0B5EBD4D6}.Release|x64.ActiveCfg = Release|Any CPU
+		{DED619A6-64DF-4689-A652-34B0B5EBD4D6}.Release|x64.Build.0 = Release|Any CPU
+		{DED619A6-64DF-4689-A652-34B0B5EBD4D6}.Release|x86.ActiveCfg = Release|Any CPU
+		{DED619A6-64DF-4689-A652-34B0B5EBD4D6}.Release|x86.Build.0 = Release|Any CPU
+		{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}.Debug|x64.Build.0 = Debug|Any CPU
+		{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}.Debug|x86.Build.0 = Debug|Any CPU
+		{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}.Release|x64.ActiveCfg = Release|Any CPU
+		{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}.Release|x64.Build.0 = Release|Any CPU
+		{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}.Release|x86.ActiveCfg = Release|Any CPU
+		{C9441A21-39B1-42CF-8BD9-CCE1EFDED825}.Release|x86.Build.0 = Release|Any CPU
 		{E09A62A8-2B61-4841-AE49-751AC92D5048}.Debug|x64.ActiveCfg = Debug|x64
 		{E09A62A8-2B61-4841-AE49-751AC92D5048}.Debug|x64.Build.0 = Debug|x64
 		{E09A62A8-2B61-4841-AE49-751AC92D5048}.Debug|x86.ActiveCfg = Debug|Win32
