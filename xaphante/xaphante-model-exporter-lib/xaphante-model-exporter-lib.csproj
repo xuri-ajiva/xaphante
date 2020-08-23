@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>xaphante_model_exporter_lib</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Assimp" Version="3.0.0" />
+      <PackageReference Include="AssimpNet" Version="4.1.0" />
+    </ItemGroup>
+
+</Project>
