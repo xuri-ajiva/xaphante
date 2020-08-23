@@ -5,27 +5,24 @@
 #include "VertexBuffer.h"
 #include "WindowWrapper.h"
 #include "_defines.h"
-#include "glm/glm.hpp"
 
 class SceneCollection;
 
 class ObjectHandler {
-	Vertex VERTICES_[4];
-	UInt32 NUM_VERTICES_ = 4;
-	UInt32 INDICES_[6]   = {
-		0, 1, 2,
-		1, 2, 3
-	};
-	UInt32 NUM_INDICES_ = 6;
+	UInt32 NUM_VERTICES_ = 0;
+	UInt32 NUM_INDICES_  = 0;
 
 	VertexBuffer*   VERTEX_BUFFER_   = nullptr;
 	IndexBuffer*    INDEX_BUFFER_    = nullptr;
 	TextureHandler* TEXTURE_HANDLER_ = nullptr;
+	bool isInit;
 
-public:					  	
+public:
 	ObjectHandler();
 
-	void Init(std::string* sceneLocation, ShaderHandler* shader);
+	bool DeconstructObjectFile(std::string* object_location, void* vertices, void* indices);
+
+	void Init(std::string* object_location, ShaderHandler* shader);
 
 	void Draw(WindowWrapper* handler) const;
 
