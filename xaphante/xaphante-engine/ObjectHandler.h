@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include "IndexBuffer.h"
 #include "ShaderHandler.h"
 #include "TextureHandler.h"
@@ -20,13 +22,13 @@ class ObjectHandler {
 public:
 	ObjectHandler();
 
-	bool DeconstructObjectFile(std::string* object_location, void* vertices, void* indices);
+	bool DeconstructObjectFile(std::string* object_location, std::vector<Vertex>* vertices, std::vector<UInt32>* indices);
 
 	void Init(std::string* object_location, ShaderHandler* shader);
 
 	void Draw(WindowWrapper* handler) const;
 
-	void CleanUp(SceneCollection* node);
+	void CleanUp(SceneCollection* node) const;
 
 	void GameLoop(SceneCollection* scene_collection);
 };

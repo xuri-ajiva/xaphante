@@ -19,7 +19,7 @@ inline std::string ReadLengthOfString(std::ifstream* s, int l) {
 	return str.c_str();
 }
 
-bool ObjectHandler::DeconstructObjectFile(std::string* object_location, void* vertices, void* indices) {
+bool ObjectHandler::DeconstructObjectFile(std::string* object_location, std::vector<Vertex>* vertices, std::vector<UInt32>* indices) {
 	auto input = std::ifstream(*object_location, std::ios::in | std::ios::binary);
 
 	if (!input.is_open()) {
@@ -45,70 +45,79 @@ bool ObjectHandler::DeconstructObjectFile(std::string* object_location, void* ve
 
 	std::vector<char> n;
 	const auto        length = static_cast<int>(nl[0]);
-	n.resize(1 + length);
+	n.resize(length + 1);
 
 	input.read(&n[0], length);
 	n[length] = '\0';
 	std::cout << "[NAME]: " << n.data() << std::endl;
 
 	int size;
-	input.read((char*)(&size), sizeof(int)); //todo check
+	input.read(reinterpret_cast<char*>(&size), sizeof(int)); //todo check
 
-	///////////////////////// BEGIN READ VERTICES	 
-
-	std::vector<Vertex>* vtc = new std::vector<Vertex>();
-	std::vector<UInt32>* ind = new std::vector<UInt32>();
-
-	input.read((char*)(&NUM_VERTICES_), size);
+	input.read(reinterpret_cast<char*>(&NUM_VERTICES_), size);
 
 	for (int i = 0; i < NUM_VERTICES_; ++i) {
 		Vertex v;
-		input.read((char*)(&v.x), sizeof(float) * 3);
-		v.u = 0;
-		v.v = 0;
-		v.r = 0;
-		v.g = 1;
-		v.b = 0;
-		v.a = 1;
+		input.read(reinterpret_cast<char*>(&v.x), sizeof(float) * 3);
+		v.x += NUM_VERTICES_ / 100;
+		auto st = i % 3;
+		switch (st) {
+			case 0:
+				v.r = 1.0f;
+				v.g = 0.0f;
+				v.b = 0.0f;
+				break;
+			case 1:
+				v.r = 0.0f;
+				v.g = 1.0f;
+				v.b = 0.0f;
+				break;
+			case 2:
+				v.r = 0.0f;
+				v.g = 0.0f;
+				v.b = 1.0f;
+				break;
+		}
 
-		vtc->push_back(v);
+		v.a = 1.0f;
+
+		std::cout << "{" << v.x << ", " << v.y << ", " << v.z  << "}"<< std::endl;
+		vertices->push_back(v);
 	}
 
-	input.read((char*)(&NUM_INDICES_), size);
+	input.read(reinterpret_cast<char*>(&NUM_INDICES_), size);
 
 	for (int i = 0; i < NUM_VERTICES_; ++i) {
 		UInt32 c;
-		input.read((char*)(&c), sizeof(UInt32));
-		ind->push_back(c);
+		input.read(reinterpret_cast<char*>(&c), sizeof(UInt32));
+		indices->push_back(c);
+		//std::cout << c << std::endl;
 	}
-
-	vertices = vtc->data();
-	indices  = ind->data();
 
 	return true;
 }
 
 void ObjectHandler::Init(std::string* object_location, ShaderHandler* shader) {
-	int VERTICES_;
-	int INDICES_;
+	auto* vertices = new std::vector<Vertex>();
+	auto* indices  = new std::vector<UInt32>();
 
-	if (!DeconstructObjectFile(object_location, &VERTICES_, &INDICES_)) {
+	if (!DeconstructObjectFile(object_location, vertices, indices)) {
 		isInit = false;
 		return;
 	}
 	isInit = true;
 
-	VERTEX_BUFFER_ = new VertexBuffer(&VERTICES_, NUM_VERTICES_);
+	VERTEX_BUFFER_ = new VertexBuffer(vertices->data(), NUM_VERTICES_);
 	VertexBuffer::Unbind();
 
-	INDEX_BUFFER_ = new IndexBuffer(&INDICES_, NUM_INDICES_, sizeof(UInt32));
+	INDEX_BUFFER_ = new IndexBuffer(indices->data(), NUM_INDICES_, sizeof(UInt32));
 	IndexBuffer::Unbind();
 
 	TEXTURE_HANDLER_ = new TextureHandler(object_location, shader);
 	TextureHandler::Unbind();
 }
 
-void ObjectHandler::CleanUp(SceneCollection* node) {
+void ObjectHandler::CleanUp(SceneCollection* node) const {
 	if (!isInit) return;
 	delete VERTEX_BUFFER_;
 	delete INDEX_BUFFER_;
