@@ -14,7 +14,6 @@
 #include <SDL.h>
 #include <stb_image.h>
 
-
 void GameHandler::GlDebugCallback(GLenum      source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message,
                                   const void* userParam) {
 	std::cout << "[Gl Error(" << severity << ")]: " << message << std::endl;
@@ -49,6 +48,7 @@ void GameHandler::Init() {
 		printf("We compiled and linking against SDL version %d.%d.%d.\n", linked.major, linked.minor, linked.patch);
 	}
 
+	glEnable(GL_DEPTH_TEST);
 	stbi_set_flip_vertically_on_load(true);
 }
 
@@ -78,7 +78,7 @@ void GameHandler::Run() {
 void GameHandler::Loop(SceneHandler* handler) {
 	RUNNING = true;
 	do {
-		if (!WINDOW_W_->BeginRenderLoop(this)) {
+		if (!WindowWrapper::BeginRenderLoop(this)) {
 			EXIT = true;
 			return;
 		}
