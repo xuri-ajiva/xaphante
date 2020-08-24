@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 	auto game = new GameHandler();
 	game->Init();
 
-	game->LoadScene(new std::string("scene/"));
+	//game->LoadScene(new std::string("scene/"));
 	game->Run();
 
 	std::cout << "Exiting!\n";

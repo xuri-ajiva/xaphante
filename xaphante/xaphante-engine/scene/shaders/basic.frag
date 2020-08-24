@@ -12,6 +12,7 @@ in vec2 v_uvs;
 void main()
 {
     vec4 color = vec4(cross(vec3(v_color) , vec3(u_color)), 1);
-    vec4 texture_color = texture(u_texture,v_uvs);
-    f_color = vec4(cross(vec3(texture_color) , vec3(v_color)), 1) * u_color;
+    vec4 texture_color = texture(u_texture, v_uvs);
+    vec4 xs = vec4(cross(vec3(texture_color) , vec3(v_color)), 1) * u_color;
+    f_color =   color;
 }
