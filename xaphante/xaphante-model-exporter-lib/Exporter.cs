@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -76,7 +77,7 @@ namespace xaphante_model_exporter_lib
             }
 
             this.token.ThrowIfCancellationRequested();
-            
+
             UpdateAdd(1, 1, "Waiting For Export...");
 
             Thread.Sleep(300);
@@ -107,7 +108,7 @@ namespace xaphante_model_exporter_lib
             UpdateAdd(0, LS, "Exporting List...");
             for (int i = 0; i < LS; i++)
             {
-                UpdateAdd(i, LS, "");
+                UpdateAdd(i, LS, lst[i].ToString());
                 this.token.ThrowIfCancellationRequested();
 
                 Marshal.StructureToPtr(lst[i], ptr + i * TS, true);
@@ -117,7 +118,7 @@ namespace xaphante_model_exporter_lib
             Marshal.FreeHGlobal(ptr);
             return arr;
         }
-        
+
         private async Task<bool> ExportToFile(string exportFile)
         {
             UpdateAdd(0, 1, "Exporting To: " + exportFile);
@@ -157,7 +158,7 @@ namespace xaphante_model_exporter_lib
             this.token.ThrowIfCancellationRequested();
 
             UpdateAdd(1, 100, "Writing Header...");
-            
+
             bf.Write("BSF");
             bf.Write(Path.GetFileNameWithoutExtension(exportFile));
 
@@ -178,7 +179,7 @@ namespace xaphante_model_exporter_lib
             Scene scene;
             try
             {
-                scene = importer.ImportFile(importFile, PostProcessPreset.TargetRealTimeMaximumQuality);
+                scene = importer.ImportFile(importFile, PostProcessSteps.Triangulate | PostProcessSteps.OptimizeMeshes | PostProcessSteps.OptimizeGraph | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.ImproveCacheLocality);
             }
             catch (Exception e)
             {
@@ -225,7 +226,17 @@ namespace xaphante_model_exporter_lib
         {
             this.token.ThrowIfCancellationRequested();
             this.dataHolder.Positions.AddRange(sceneMesh.Vertices);
-            this.dataHolder.Indices.AddRange(sceneMesh.GetUnsignedIndices());
+            //this.dataHolder.Indices.AddRange(sceneMesh.GetUnsignedIndices());
+
+            if (sceneMesh.HasFaces)
+            {
+                foreach (var face in sceneMesh.Faces.Where(face => face.IndexCount > 0 && face.Indices != null))
+                {
+                    foreach (uint index in face.Indices)
+                        this.dataHolder.Indices.Add(index);
+                }
+            }
+
             Update("Processed");
         }
 
