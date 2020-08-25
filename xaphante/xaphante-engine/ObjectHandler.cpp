@@ -60,6 +60,7 @@ bool ObjectHandler::DeconstructObjectFile(std::string* object_location, std::vec
 		Vertex v;
 		input.read(reinterpret_cast<char*>(&v.x), sizeof(float) * 3);
 		v.x += NUM_VERTICES_ / 100;
+
 		auto st = i % 3;
 		switch (st) {
 			case 0:
@@ -79,15 +80,16 @@ bool ObjectHandler::DeconstructObjectFile(std::string* object_location, std::vec
 				break;
 		}
 
+		
 		v.a = 1.0f;
 
-		std::cout << "{" << v.x << ", " << v.y << ", " << v.z  << "}"<< std::endl;
+		//std::cout << "{" << v.x << ", " << v.y << ", " << v.z << "}" << std::endl;
 		vertices->push_back(v);
 	}
 
 	input.read(reinterpret_cast<char*>(&NUM_INDICES_), size);
 
-	for (int i = 0; i < NUM_VERTICES_; ++i) {
+	for (int i = 0; i < NUM_INDICES_; ++i) {
 		UInt32 c;
 		input.read(reinterpret_cast<char*>(&c), sizeof(UInt32));
 		indices->push_back(c);
