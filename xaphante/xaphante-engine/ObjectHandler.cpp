@@ -29,11 +29,11 @@ bool ObjectHandler::DeconstructObjectFile(std::string* object_location, std::vec
 
 	char tmpLength;
 
-	char l[5];				 //header
-	l[4] = '\0';
-	input.read(l, 4);
+	char l[6];				 //header
+	l[5] = '\0';
+	input.read(l, 5);
 
-	if (std::strncmp(&l[0], "\3BSF", 4) != 0) {
+	if (std::strncmp(&l[0], "\4BOBF", 5) != 0) {
 		std::cout << "[ERROR]: WRONG FILE FORMAT" << std::endl;
 		return false;
 	}
@@ -59,9 +59,9 @@ bool ObjectHandler::DeconstructObjectFile(std::string* object_location, std::vec
 	for (int i = 0; i < NUM_VERTICES_; ++i) {
 		Vertex v;
 		input.read(reinterpret_cast<char*>(&v.x), sizeof(float) * 3);
-		v.x += NUM_VERTICES_ / 100;
+		//v.x += NUM_VERTICES_ / 100;
 
-		auto st = i % 3;
+		auto st = i % 6;
 		switch (st) {
 			case 0:
 				v.r = 1.0f;
@@ -77,9 +77,20 @@ bool ObjectHandler::DeconstructObjectFile(std::string* object_location, std::vec
 				v.r = 0.0f;
 				v.g = 0.0f;
 				v.b = 1.0f;
+			case 3:
+				v.r = 0.0f;
+				v.g = 1.0f;
+				v.b = 1.0f;
+			case 4:
+				v.r = 1.0f;
+				v.g = 1.0f;
+				v.b = 0.0f;
+			case 5:
+				v.r = 1.0f;
+				v.g = 0.0f;
+				v.b = 1.0f;
 				break;
 		}
-
 		
 		v.a = 1.0f;
 

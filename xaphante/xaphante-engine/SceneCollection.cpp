@@ -17,8 +17,8 @@ void SceneCollection::Init(std::string* vertexShader, std::string* fragmentShade
 
 	for (const auto& entry : std::filesystem::directory_iterator(*SCENE_COLLECTION_LOCATION_)) {
 		auto location = entry.path().string();
-		location = location.replace(location.find('\\'), 1, "/");
-				
+		location      = location.replace(location.find('\\'), 1, "/");
+
 		const size_t last_slash_idx = location.find_last_of("\\/");
 		if (std::string::npos != last_slash_idx) {
 			if (location[last_slash_idx + 1] == '_') {
@@ -40,9 +40,9 @@ void SceneCollection::Init(std::string* vertexShader, std::string* fragmentShade
 void SceneCollection::Draw(WindowWrapper* window) const {
 	SHADER_->Bind();
 	glUniform4f(colorUniform,
-	            sinf(this->SCENE_HANDLER_->GAME_H_->WINDOW_W_->time),
-	            cosf(window->time),
-	            -sinf(window->time),
+	            sinf( window->time / 10.0f),
+	            cosf( window->time / 10.0f),
+	            -sinf(window->time / 10.0f),
 	            1.0f)GL_ERROR
 
 	glUniformMatrix4fv(modelUniform, 1, false, &MODEL_VIEW_PROJE[0][0])GL_ERROR
