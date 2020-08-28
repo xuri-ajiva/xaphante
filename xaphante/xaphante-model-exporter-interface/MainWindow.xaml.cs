@@ -30,6 +30,24 @@ namespace xaphante_model_exporter_interface
         public MainWindow()
         {
             InitializeComponent();
+            FileWriter.Infos += delegate(string s) {
+                this.Dispatcher?.Invoke(() => {
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        return;
+                    }
+
+                    this.status.AppendText(s + "\n");
+                    this.status.Focus();
+                    this.status.CaretIndex = this.status.Text.Length;
+                    this.status.ScrollToEnd();
+                });
+            };
+            FileWriter.UpdateStatus += delegate(double d) {
+                this.Dispatcher?.Invoke(() => {
+                    this.progBar2.Value = d * this.progBar2.Maximum;
+                });
+            };
         }
 
         private void Progress(object sender, RoutedEventArgs e)
@@ -49,7 +67,7 @@ namespace xaphante_model_exporter_interface
 
                 try
                 {
-                    await exp.Export(inf, exf);
+                    await exp.Run(inf, exf);
                 }
                 catch (Exception exception)
                 {
