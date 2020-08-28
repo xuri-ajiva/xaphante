@@ -44,7 +44,7 @@ namespace xaphante_model_exporter_lib
     public class Exporter
     {
         private readonly Action<ProgressEvent> statusCallback;
-        private readonly CancellationToken     token;
+        private          CancellationToken     token;
 
         private ProgressEvent last = new ProgressEvent(0, "Initializing");
 
@@ -66,7 +66,9 @@ namespace xaphante_model_exporter_lib
 
         public SceneDataExportable dataHolder = new SceneDataExportable();
 
-        public async Task<bool> Export(string importFile, string exportFile)
+        private FileWriter writer;
+
+        public async Task<bool> Run(string importFile, string exportFile)
         {
             bool success = ImportScene(importFile);
             if (!success)
@@ -80,6 +82,7 @@ namespace xaphante_model_exporter_lib
 
             UpdateAdd(1, 1, "Waiting For Export...");
 
+            this.writer = new FileWriter(exportFile, XaphanteFileType.ObjectFile);
             Thread.Sleep(300);
 
             this.token.ThrowIfCancellationRequested();
@@ -96,73 +99,28 @@ namespace xaphante_model_exporter_lib
 
         Config<uint> config = new Config<uint>();
 
-        byte[] ListToBytes <T>(List<T> lst)
-        {
-            int LS = lst.Count;
-            int TS = Marshal.SizeOf<T>();
-
-            byte[] arr = new byte[TS * LS];
-
-            IntPtr ptr = Marshal.AllocHGlobal(arr.Length);
-
-            UpdateAdd(0, LS, "Exporting List...");
-            for (int i = 0; i < LS; i++)
-            {
-                UpdateAdd(i, LS, "");
-                this.token.ThrowIfCancellationRequested();
-
-                Marshal.StructureToPtr(lst[i], ptr + i * TS, true);
-            }
-
-            Marshal.Copy(ptr, arr, 0, arr.Length);
-            Marshal.FreeHGlobal(ptr);
-            return arr;
-        }
-
         private async Task<bool> ExportToFile(string exportFile)
         {
             UpdateAdd(0, 1, "Exporting To: " + exportFile);
-            if (File.Exists(exportFile))
-            {
-                Update("Output File exists Moving to .rnd.old!");
-                Thread.Sleep(1000);
-                File.Move(exportFile, exportFile + new Random().NextDouble() + ".old");
-            }
 
-            var st = File.Open(exportFile, FileMode.CreateNew);
+            this.writer.Open();
 
-            await using var bf = new BinaryWriter(st);
-
-            WriteHeader(bf, exportFile);
+            this.writer.WriteHeader(ref this.token);
+            this.writer.Writer.Write(this.config.Size);
 
             UpdateAdd(1, 100, "Writing Vertices...");
-            bf.Write(this.dataHolder.Positions.Count);
-            bf.Write(ListToBytes(this.dataHolder.Positions));
+            this.writer.WriteList(this.dataHolder.Positions, ref this.token);
 
             this.token.ThrowIfCancellationRequested();
 
             UpdateAdd(1, 100, "Writing Indices...");
-            bf.Write(this.dataHolder.Indices.Count);
-            bf.Write(ListToBytes(this.dataHolder.Indices));
+            this.writer.WriteList(this.dataHolder.Indices, ref this.token);
 
-            await st.FlushAsync(this.token);
-            st.Close();
+            this.writer.Close();
 
             UpdateAdd(1, 1, "Finished !");
 
             return true;
-        }
-
-        private void WriteHeader(BinaryWriter bf, string exportFile)
-        {
-            this.token.ThrowIfCancellationRequested();
-
-            UpdateAdd(1, 100, "Writing Header...");
-
-            bf.Write("BSF");
-            bf.Write(Path.GetFileNameWithoutExtension(exportFile));
-
-            bf.Write(this.config.Size);
         }
 
         #endregion
@@ -176,15 +134,29 @@ namespace xaphante_model_exporter_lib
 
             var importer = new AssimpContext();
             importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
-            Scene scene;
-            try
+            Scene scene = default;
+            var task = Task.Run(() => {
+                    try
+                    {
+                        scene = importer.ImportFile(importFile, PostProcessSteps.Triangulate | PostProcessSteps.OptimizeMeshes | PostProcessSteps.OptimizeGraph | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.ImproveCacheLocality);
+                    }
+                    catch (Exception e)
+                    {
+                        Update(e.Message);
+                    }
+                },
+                this.token);
+
+            UpdateAdd(0, 1, "Importing...");
+            
+            int       i   = 0;
+            const int max = 100;
+            var       r   = new Random();
+            
+            while (!task.IsCompleted)
             {
-                scene = importer.ImportFile(importFile, PostProcessSteps.Triangulate | PostProcessSteps.OptimizeMeshes | PostProcessSteps.OptimizeGraph | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.ImproveCacheLocality);
-            }
-            catch (Exception e)
-            {
-                Update(e.Message);
-                return false;
+                UpdateAdd(i++ % max, max, "");
+                Thread.Sleep(1 + (int) (r.NextDouble() * i%max / 10));
             }
 
             if (scene == null || (scene.SceneFlags & SceneFlags.Incomplete) != 0 || scene.RootNode == null)
@@ -227,7 +199,6 @@ namespace xaphante_model_exporter_lib
             this.token.ThrowIfCancellationRequested();
             this.dataHolder.Positions.AddRange(sceneMesh.Vertices);
             this.dataHolder.Indices.AddRange(sceneMesh.GetUnsignedIndices());
-
 
             //if (sceneMesh.HasFaces)
             //{
