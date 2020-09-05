@@ -89,6 +89,7 @@ namespace xaphante_model_exporter_lib
             int ts = Marshal.SizeOf<T>();
 
             int onPercent = (int) (ls / 100d);
+            onPercent = onPercent == 0 ? 1 : onPercent;
 
             byte[] arr = new byte[ts * ls];
 
@@ -104,9 +105,11 @@ namespace xaphante_model_exporter_lib
                 OnUpdateStatus(i, ls);
                 token.ThrowIfCancellationRequested();
             }
-
+            OnUpdateStatus(1, 2);
+            
             Marshal.Copy(ptr, arr, 0, arr.Length);
             Marshal.FreeHGlobal(ptr);
+            OnUpdateStatus(1, 1);
 
             this.Writer.Write(ls);
             this.Writer.Write(arr);
