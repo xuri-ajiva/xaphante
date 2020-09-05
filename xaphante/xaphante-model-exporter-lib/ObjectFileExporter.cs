@@ -18,8 +18,22 @@ namespace xaphante_model_exporter_lib
 {
     public class SceneDataExportable
     {
-        public List<Vector3D> Positions = new List<Vector3D>();
+        public List<Position> Positions = new List<Position>();
         public List<UInt32>   Indices   = new List<UInt32>();
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Position
+    {
+        public Vector3D pos;
+
+        public Vector3D normal;
+
+        public Position(Vector3D pos, Vector3D normal)
+        {
+            this.normal = normal;
+            this.pos    = pos;
+        }
     }
 
     public class Config <T>
@@ -138,7 +152,7 @@ namespace xaphante_model_exporter_lib
             var task = Task.Run(() => {
                     try
                     {
-                        scene = importer.ImportFile(importFile, PostProcessSteps.Triangulate | PostProcessSteps.OptimizeMeshes | PostProcessSteps.OptimizeGraph | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.ImproveCacheLocality);
+                        scene = importer.ImportFile(importFile, PostProcessSteps.Triangulate | PostProcessSteps.GenerateSmoothNormals | PostProcessSteps.OptimizeMeshes | PostProcessSteps.OptimizeGraph | PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.ImproveCacheLocality);
                     }
                     catch (Exception e)
                     {
@@ -148,15 +162,15 @@ namespace xaphante_model_exporter_lib
                 this.token);
 
             UpdateAdd(0, 1, "Importing...");
-            
+
             int       i   = 0;
             const int max = 100;
             var       r   = new Random();
-            
+
             while (!task.IsCompleted)
             {
                 UpdateAdd(i++ % max, max, "");
-                Thread.Sleep(1 + (int) (r.NextDouble() * i%max / 10));
+                Thread.Sleep(1 + (int) (r.NextDouble() * i % max / 10));
             }
 
             if (scene == null || (scene.SceneFlags & SceneFlags.Incomplete) != 0 || scene.RootNode == null)
@@ -197,7 +211,7 @@ namespace xaphante_model_exporter_lib
         private void ProcessMesh(Mesh sceneMesh, Scene scene)
         {
             this.token.ThrowIfCancellationRequested();
-            this.dataHolder.Positions.AddRange(sceneMesh.Vertices);
+            this.dataHolder.Positions.AddRange(GenVertices(sceneMesh));
             this.dataHolder.Indices.AddRange(sceneMesh.GetUnsignedIndices());
 
             //if (sceneMesh.HasFaces)
@@ -210,6 +224,20 @@ namespace xaphante_model_exporter_lib
             //}
 
             Update("Processed");
+        }
+
+        private IEnumerable<Position> GenVertices(Mesh sceneMesh)
+        {
+            if (sceneMesh.HasNormals)
+                for (var i = 0; i < sceneMesh.VertexCount; i++)
+                {
+                    yield return new Position(sceneMesh.Vertices[i], sceneMesh.Normals[i]);
+                }
+            else
+                for (var i = 0; i < sceneMesh.VertexCount; i++)
+                {
+                    yield return new Position(sceneMesh.Vertices[i], default);
+                }
         }
 
         #endregion
