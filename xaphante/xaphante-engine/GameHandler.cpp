@@ -78,7 +78,7 @@ void GameHandler::Run() {
 void GameHandler::Loop(SceneHandler* handler) {
 	RUNNING = true;
 	do {
-		if (!WindowWrapper::BeginRenderLoop(this)) {
+		if (!WINDOW_W_->BeginRenderLoop(this)) {
 			EXIT = true;
 			return;
 		}

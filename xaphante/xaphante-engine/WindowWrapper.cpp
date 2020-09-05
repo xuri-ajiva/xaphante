@@ -55,25 +55,38 @@ Float32 WindowWrapper::Aspect() const {
 
 bool WindowWrapper::BeginRenderLoop(GameHandler* game) {
 	SDL_Event event;
+	auto status_continue = true;
+
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 			case SDL_QUIT:
-				return false;
+				status_continue &= false;
+				break;
 			case SDL_KEYDOWN:
-				return static_cast<GameHandler*>(game)->KeyEvent(event.key.keysym.sym, event.key.keysym.mod, true);
+				if (KEY_DOWN_SET_.find(event.key.keysym.sym) == KEY_DOWN_SET_.end()) {
+					KEY_DOWN_SET_.insert(event.key.keysym.sym);
+
+					status_continue &= game->KeyEvent(event.key.keysym.sym, event.key.keysym.mod, true);
+				}
+				break;
 			case SDL_KEYUP:
-				return static_cast<GameHandler*>(game)->KeyEvent(event.key.keysym.sym, event.key.keysym.mod, false);
+				if (KEY_DOWN_SET_.find(event.key.keysym.sym) != KEY_DOWN_SET_.end()) {
+					KEY_DOWN_SET_.erase(event.key.keysym.sym);
+
+					status_continue &= game->KeyEvent(event.key.keysym.sym, event.key.keysym.mod, false);
+				}
+				break;
 			case SDL_MOUSEMOTION:
 				static_cast<GameHandler*>(game)->MouseMove(event.motion.xrel, event.motion.yrel);
 				break;
 			default:
-				break;;
+				break;
 		}
 	}
 
 	glClearColor(.1f, .1f, .1f, .1f)GL_ERROR
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)GL_ERROR
-	return true;
+	return status_continue;
 }
 
 void WindowWrapper::EndRenderLoop() {

@@ -1,4 +1,6 @@
 #pragma once	  
+#include <set>
+
 #include "_defines.h"
 
 class GameHandler;
@@ -9,9 +11,10 @@ class WindowWrapper {
 	UInt64      lastCounter             = SDL_GetPerformanceCounter();
 	std::string staticTitle             = "xaphante-game-engine";
 	Float32     secondProcess           = 0.0f;
-
+	
 #define updateFps 0.3f
-public:
+public:					  
+	std::set<int> KEY_DOWN_SET_ {};
 	Float32 delta = 0.0f;
 	Float64 time  = 0.0f;
 
@@ -27,7 +30,7 @@ public:
 
 	Float32 Aspect() const;
 
-	static bool BeginRenderLoop(GameHandler* game);
+	bool BeginRenderLoop(GameHandler* game);
 
 	void EndRenderLoop();
 };
