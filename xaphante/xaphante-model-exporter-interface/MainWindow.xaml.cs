@@ -72,6 +72,7 @@ namespace xaphante_model_exporter_interface
                 catch (Exception exception)
                 {
                     StatusCallback(new ProgressEvent(1, exception.Message));
+                    StatusCallback(new ProgressEvent(1, exception.StackTrace));
                 }
             });
 
