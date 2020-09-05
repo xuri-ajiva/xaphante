@@ -6,6 +6,7 @@
 
 #include <GL/glew.h>
 #include <SDL.h>
+#include "glm/glm.hpp"
 
 inline void _GLGetError(const char* file, int line, const char* call) {
 	while (GLenum error = glGetError()) {
@@ -51,19 +52,19 @@ typedef float  Float32;
 typedef double Float64;
 
 struct Vertex {
-	Float32 x;
-	Float32 y;
-	Float32 z;
+	glm::vec3 pos;
 
-	Float32 u;
-	Float32 v;
+	glm::vec3 normal;
 
-	Float32 r;
-	Float32 g;
-	Float32 b;
-	Float32 a;
+	//Float32 u;
+	//Float32 v;
+	//
+	//Float32 r;
+	//Float32 g;
+	//Float32 b;
+	//Float32 a;
 
-	std::string XYZ() {
-		return "{"+ std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
-	}
+	//std::string XYZ() {
+	//	return "{"+ std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
+	//}
 };

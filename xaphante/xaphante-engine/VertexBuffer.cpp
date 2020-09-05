@@ -1,4 +1,4 @@
-#include "VertexBuffer.h"	  
+#include "VertexBuffer.h"
 
 #include <cstddef>
 #include <GL/glew.h>
@@ -7,16 +7,14 @@ VertexBuffer::VertexBuffer(void* data, UInt32 num_vertices) {
 	glGenVertexArrays(1, &VAO_);
 	glBindVertexArray(VAO_);
 
-	glGenBuffers(1, &BUFFER_ID_);
-	glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID_);
-	glBufferData(GL_ARRAY_BUFFER, num_vertices * sizeof(Vertex), data, GL_STATIC_DRAW);
+	glGenBuffers(1, &BUFFER_ID_)GL_ERROR
+	glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID_)GL_ERROR
+	glBufferData(GL_ARRAY_BUFFER, num_vertices * sizeof(Vertex), data, GL_STATIC_DRAW) GL_ERROR
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(struct Vertex, x));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(struct Vertex, pos)))GL_ERROR
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(struct Vertex, u));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(struct Vertex, r));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(struct Vertex, normal)))GL_ERROR
 
 	glBindVertexArray(0);
 }
