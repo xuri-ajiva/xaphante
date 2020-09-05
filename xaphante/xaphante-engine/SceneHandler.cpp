@@ -26,7 +26,7 @@ void SceneHandler::Init(std::string* sceneLocation) {
 
 		const size_t last_slash_idx = location.find_last_of("\\/");
 		if (std::string::npos != last_slash_idx) {
-			if(location[last_slash_idx + 1] == '_') {
+			if (location[last_slash_idx + 1] == '_') {
 				continue;
 			}
 		}
@@ -65,15 +65,33 @@ bool spd = false;
 void SceneHandler::GameLoop(float delta) {
 	auto speed = CAMERA_SPEED_ + (spd ? CAMERA_FAST_SPEED : CAMERA_DEFAULT_SPEED);
 
-	if (dw) CAMERA->MoveForward(delta * speed);
-	if (ds) CAMERA->MoveForward(delta * -speed);
-	if (da) CAMERA->MoveSideways(delta * -speed);
-	if (dd) CAMERA->MoveSideways(delta * speed);
+	auto set = GAME_H_->WINDOW_W_->KEY_DOWN_SET_;
+	for (auto itr = set.begin(); itr != set.end(); ++itr) {
+		const auto key = *itr;
+		
+		switch (key) {
+			case SDLK_w:
+				CAMERA->MoveForward(delta * speed);
+				break;
+			case SDLK_a:
+				CAMERA->MoveSideways(delta * -speed);
+				break;
+			case SDLK_s:
+				CAMERA->MoveForward(delta * -speed);
+				break;
+			case SDLK_d:
+				CAMERA->MoveSideways(delta * speed);
+				break;
+
+			default:
+				break;
+		}
+	}
 
 	CAMERA->Update();
 
 	for (auto* collection : *sceneCollection) {
-		collection->GameLoop(this);
+		collection->GameLoop(delta);
 	}
 }
 
@@ -83,19 +101,6 @@ void SceneHandler::MouseMove(Sint32 xRel, Sint32 yRel) const {
 
 bool SceneHandler::KeyEvent(SDL_Keycode key, UInt16 mod, bool down) {
 	switch (key) {
-		case SDLK_w:
-			dw = down;
-			break;
-		case SDLK_a:
-			da = down;
-			break;
-		case SDLK_s:
-			ds = down;
-			break;
-		case SDLK_d:
-			dd = down;
-			break;
-
 		case SDLK_ESCAPE:
 			GAME_H_->RUNNING = false;
 			return false;
@@ -108,7 +113,7 @@ bool SceneHandler::KeyEvent(SDL_Keycode key, UInt16 mod, bool down) {
 		case SDLK_LSHIFT:
 			spd = down;
 			break;
-
+		
 		default:
 			break;
 	}
