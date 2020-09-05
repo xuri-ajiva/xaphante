@@ -69,6 +69,10 @@ public:
 		VIEW_PROJ = PROJ * VIEW;
 	}
 
+	glm::mat4 GetView() const {
+		return VIEW;
+	}
+
 	float PITCH_MIN_MAX      = 89.0f;
 	float MOUSE_SENSITIVITY_ = 0.3f;
 protected:
@@ -79,6 +83,7 @@ protected:
 	glm::vec3 UP_ = {0.0f, 1.0f, 0.0f};
 
 };
+
 
 class FpsCamera : public FreeCamera {
 public:
