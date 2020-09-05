@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:xaphante_model_exporter_interface"
         mc:Ignorable="d"
-        Title="MainWindow" Height="357" Width="471" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{DynamicResource GridBackground1}" Foreground="#FF1A7DFB">
+        Title="MainWindow" Height="600" Width="800" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{DynamicResource GridBackground1}" Foreground="#FF1A7DFB">
     <Window.Resources>
         <LinearGradientBrush x:Key="GridBackground1" EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="#FF032B53"/>
