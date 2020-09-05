@@ -33,19 +33,23 @@ void SceneCollection::Init(std::string* vertexShader, std::string* fragmentShade
 		objects->push_back(obj);
 	}
 
-	modelUniform = glGetUniformLocation(SHADER_->GetShaderId(), "u_modelViewProje") GL_ERROR
-	colorUniform = glGetUniformLocation(SHADER_->GetShaderId(), "u_color") GL_ERROR
+	modelUniform        = glGetUniformLocation(SHADER_->GetShaderId(), "u_modelViewProje") GL_ERROR
+	modelViewUniform    = glGetUniformLocation(SHADER_->GetShaderId(), "u_modelView") GL_ERROR
+	invModelViewUniform = glGetUniformLocation(SHADER_->GetShaderId(), "u_invModelView") GL_ERROR
 }
 
-void SceneCollection::Draw(WindowWrapper* window) const {
+void SceneCollection::Draw(WindowWrapper* window) {
+
+	MODEL_VIEW_PROJE = SCENE_HANDLER_->CAMERA->GetViewProj() * MODEL;
+
+	glm::mat4 modelView    = SCENE_HANDLER_->CAMERA->GetView() * MODEL;
+	glm::mat4 invModelView = transpose(inverse(modelView));
+
 	SHADER_->Bind();
-	glUniform4f(colorUniform,
-	            sinf( window->time / 10.0f),
-	            cosf( window->time / 10.0f),
-	            -sinf(window->time / 10.0f),
-	            1.0f)GL_ERROR
 
 	glUniformMatrix4fv(modelUniform, 1, false, &MODEL_VIEW_PROJE[0][0])GL_ERROR
+	glUniformMatrix4fv(modelViewUniform, 1, false, &modelView[0][0])GL_ERROR
+	glUniformMatrix4fv(invModelViewUniform, 1, false, &invModelView[0][0])GL_ERROR
 
 	for (auto collection : *objects) {
 		collection->Draw(window);
@@ -63,15 +67,11 @@ void SceneCollection::CleanUp(SceneHandler* scene_handler) {
 	delete SHADER_;
 }
 
-void SceneCollection::GameLoop(SceneHandler* scene_handler) {
+void SceneCollection::GameLoop(float delta) {
 	for (auto collection : *objects) {
-		collection->GameLoop(this);
+		collection->GameLoop(delta);
 	}
 
-	//MODEL = rotate(MODEL, 1.0f * scene_handler->WINDOW_W_->delta, glm::vec3(0, 1, 0));
-	//MODEL = glm::translate(MODEL, glm::vec3(0, 0, sinf(scene_handler->WINDOW_W_->time) * scene_handler->WINDOW_W_->delta));
-
-	MODEL_VIEW_PROJE = SCENE_HANDLER_->CAMERA->GetViewProj() * MODEL;
-
-	//std::cout << "Time: " << scene_handler->WINDOW_W_->time << std::endl;
+	MODEL = rotate(MODEL, 1.0f * delta, glm::vec3(0, 1, 0));
+	//MODEL = glm::translate(MODEL, glm::vec3(0, 0, sinf(delta->WINDOW_W_->time) * delta->WINDOW_W_->delta));
 }
