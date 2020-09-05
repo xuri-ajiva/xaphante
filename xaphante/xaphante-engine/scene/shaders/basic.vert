@@ -1,17 +1,19 @@
 #version 330 core
 
 layout(location = 0) in vec3 a_position;
-layout(location = 1) in vec2 a_uvs;
-layout(location = 2) in vec4 a_color;
+layout(location = 1) in vec3 a_normal;
 
-out vec4 v_color;
-out vec2 v_uvs;
+out vec3 v_normal;
+out vec3 v_position;
 
 uniform mat4 u_modelViewProje;
+uniform mat4 u_modelView;
+uniform mat4 u_invModelView;
 
 void main()
 {
-    gl_Position = u_modelViewProje * vec4(a_position, 1.0f) ;
-    v_color = a_color;
-    v_uvs = a_uvs;
+    gl_Position = u_modelViewProje * vec4(a_position, 1.0f);
+
+    v_normal   = mat3(u_invModelView) * a_normal;
+    v_position = vec3(u_modelView * vec4(a_position, 1.0f));
 }
