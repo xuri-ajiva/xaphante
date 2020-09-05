@@ -30,5 +30,5 @@ public:
 
 	void CleanUp(SceneCollection* node) const;
 
-	void GameLoop(SceneCollection* scene_collection);
+	void GameLoop(float delta);
 };

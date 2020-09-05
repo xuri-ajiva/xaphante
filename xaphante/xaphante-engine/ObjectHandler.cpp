@@ -56,45 +56,17 @@ bool ObjectHandler::DeconstructObjectFile(std::string* object_location, std::vec
 
 	input.read(reinterpret_cast<char*>(&NUM_VERTICES_), size);
 
-	for (int i = 0; i < NUM_VERTICES_; ++i) {
-		Vertex v;
-		input.read(reinterpret_cast<char*>(&v.x), sizeof(float) * 3);
+	for (unsigned int i = 0; i < NUM_VERTICES_; ++i) {
+		Vertex v {};											  
+		input.read(reinterpret_cast<char*>(&v.pos), sizeof(float) * 3);	
+		input.read(reinterpret_cast<char*>(&v.normal), sizeof(float) * 3);	
 		//v.x += NUM_VERTICES_ / 100;
 
-		auto st = i % 6;
-		switch (st) {
-			case 0:
-				v.r = 1.0f;
-				v.g = 0.0f;
-				v.b = 0.0f;
-				break;
-			case 1:
-				v.r = 0.0f;
-				v.g = 1.0f;
-				v.b = 0.0f;
-				break;
-			case 2:
-				v.r = 0.0f;
-				v.g = 0.0f;
-				v.b = 1.0f;
-			case 3:
-				v.r = 0.0f;
-				v.g = 1.0f;
-				v.b = 1.0f;
-			case 4:
-				v.r = 1.0f;
-				v.g = 1.0f;
-				v.b = 0.0f;
-			case 5:
-				v.r = 1.0f;
-				v.g = 0.0f;
-				v.b = 1.0f;
-				break;
-		}
-		
-		v.a = 1.0f;
+		//auto st = i % 6;
+		//switch (st) {case 0:v.r = 1.0f;v.g = 0.0f;v.b = 0.0f;break;case 1:v.r = 0.0f;v.g = 1.0f;v.b = 0.0f;break;case 2:v.r = 0.0f;v.g = 0.0f;v.b = 1.0f;case 3:v.r = 0.0f;v.g = 1.0f;v.b = 1.0f;case 4:v.r = 1.0f;v.g = 1.0f;v.b = 0.0f;case 5:v.r = 1.0f;v.g = 0.0f;v.b = 1.0f;break;}
+		//v.a = 1.0f;
 
-		//std::cout << "{" << v.x << ", " << v.y << ", " << v.z << "}" << std::endl;
+		//std::cout << "{" << v.position.x << ", " << v.position.y << ", " << v.position.z << "}" << std::endl;
 		vertices->push_back(v);
 	}
 
@@ -141,7 +113,7 @@ void ObjectHandler::Draw(WindowWrapper* handler) const {
 	if (!isInit) return;
 	VERTEX_BUFFER_->Bind();
 	INDEX_BUFFER_->Bind();
-	TEXTURE_HANDLER_->Bind();
+	//TEXTURE_HANDLER_->Bind();
 
 	glDrawElements(GL_TRIANGLES, NUM_INDICES_,GL_UNSIGNED_INT, nullptr);
 	//glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES_);
@@ -150,6 +122,7 @@ void ObjectHandler::Draw(WindowWrapper* handler) const {
 	//TextureHandler::Unbind();
 }
 
-void ObjectHandler::GameLoop(SceneCollection* scene_collection) {
+void ObjectHandler::GameLoop(float delta) {
 	if (!isInit) return;
+	
 }
