@@ -6,10 +6,12 @@
 class SceneHandler;
 class SceneCollection;	
 class WindowWrapper;
+class ResourceLoader;
 
 #include "SceneHandler.h"
 #include "SceneCollection.h"
 #include "WindowWrapper.h"
+#include "ResourceLoader.h"
 
 class GameHandler {
 	SceneHandler*  scene {};

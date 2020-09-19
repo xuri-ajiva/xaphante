@@ -13,9 +13,8 @@ class SceneCollection {
 public:
 
 	std::vector<ObjectHandler*>* objects {};
-	std::string*                 SCENE_COLLECTION_LOCATION_;
 
-	void Init(std::string* vertexShader, std::string* fragmentShader);
+	void Init();
 
 	void Draw(WindowWrapper* window);
 
@@ -23,7 +22,7 @@ public:
 
 	void GameLoop(float delta);
 
-	SceneCollection(SceneHandler* handler, std::string* sceneCollectionLocation);
+	SceneCollection(SceneHandler* handler, ShaderHandler* shader);
 
 private:
 	glm::mat4 MODEL {};

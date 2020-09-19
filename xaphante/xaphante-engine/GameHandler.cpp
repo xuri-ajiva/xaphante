@@ -64,8 +64,8 @@ void GameHandler::LoadScene(std::string* scenePath) {
 		WINDOW_W_->Reset();
 	}
 
-	scene = new SceneHandler(this);
-	scene->Init(scenePath);
+	scene = new SceneHandler(this,scenePath);
+	scene->Init();
 }
 
 void GameHandler::Run() {
@@ -125,8 +125,8 @@ void GameHandler::Tests() {
 	for (int i = 0; i < num_test; ++i) {
 		if (i % 20 == 0) PrintMenAndIndex(i);
 
-		scene = new SceneHandler(this);
-		scene->Init(testScene);
+		scene = new SceneHandler(this,testScene);
+		scene->Init();
 		WINDOW_W_->BeginRenderLoop(this);
 		scene->GameLoop(WINDOW_W_->delta);
 		scene->Draw();

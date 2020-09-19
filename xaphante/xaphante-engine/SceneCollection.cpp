@@ -2,8 +2,9 @@
 
 #include <filesystem>
 
-SceneCollection::SceneCollection(SceneHandler* handler, std::string* sceneCollectionLocation): SCENE_COLLECTION_LOCATION_(sceneCollectionLocation),
-                                                                                               SCENE_HANDLER_(handler) {
+SceneCollection::SceneCollection(SceneHandler* handler, ShaderHandler* shader):
+	SHADER_(shader), SCENE_HANDLER_(handler) {
+
 	objects = new std::vector<ObjectHandler*>();
 
 	MODEL = glm::mat4(1.0f);
@@ -11,28 +12,7 @@ SceneCollection::SceneCollection(SceneHandler* handler, std::string* sceneCollec
 	MODEL_VIEW_PROJE = SCENE_HANDLER_->CAMERA->GetViewProj() * MODEL;
 }
 
-void SceneCollection::Init(std::string* vertexShader, std::string* fragmentShader) {
-	SHADER_ = new ShaderHandler(vertexShader, fragmentShader);
-	SHADER_->Bind();
-
-	for (const auto& entry : std::filesystem::directory_iterator(*SCENE_COLLECTION_LOCATION_)) {
-		auto location = entry.path().string();
-		location      = location.replace(location.find('\\'), 1, "/");
-
-		const size_t last_slash_idx = location.find_last_of("\\/");
-		if (std::string::npos != last_slash_idx) {
-			if (location[last_slash_idx + 1] == '_') {
-				continue;
-			}
-		}
-
-		std::cout << "[LOADING]: " << location << std::endl;
-
-		auto* obj = new ObjectHandler();
-		obj->Init(&location, SHADER_);
-		objects->push_back(obj);
-	}
-
+void SceneCollection::Init() {
 	modelUniform        = glGetUniformLocation(SHADER_->GetShaderId(), "u_modelViewProje") GL_ERROR
 	modelViewUniform    = glGetUniformLocation(SHADER_->GetShaderId(), "u_modelView") GL_ERROR
 	invModelViewUniform = glGetUniformLocation(SHADER_->GetShaderId(), "u_invModelView") GL_ERROR
@@ -51,14 +31,14 @@ void SceneCollection::Draw(WindowWrapper* window) {
 	glUniformMatrix4fv(modelViewUniform, 1, false, &modelView[0][0])GL_ERROR
 	glUniformMatrix4fv(invModelViewUniform, 1, false, &invModelView[0][0])GL_ERROR
 
-	for (auto collection : *objects) {
+	for (auto* collection : *objects) {
 		collection->Draw(window);
 	}
 	SHADER_->Unbind();
 }
 
 void SceneCollection::CleanUp(SceneHandler* scene_handler) {
-	for (auto collection : *objects) {
+	for (auto* collection : *objects) {
 		collection->CleanUp(this);
 		delete collection;
 	}
@@ -68,7 +48,7 @@ void SceneCollection::CleanUp(SceneHandler* scene_handler) {
 }
 
 void SceneCollection::GameLoop(float delta) {
-	for (auto collection : *objects) {
+	for (auto* collection : *objects) {
 		collection->GameLoop(delta);
 	}
 

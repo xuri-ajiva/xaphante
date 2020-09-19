@@ -3,42 +3,18 @@
 #include <filesystem>
 #include <vector>
 
-SceneHandler::SceneHandler(GameHandler* game): SCENE_LOCATION_(nullptr) {
-	GAME_H_ = game;
+#include "ResourceLoader.h"
 
-	sceneCollection = new std::vector<SceneCollection*>();
+SceneHandler::SceneHandler(GameHandler* game, std::string* sceneLocation):
+	resource(new ResourceLoader(this, sceneLocation)), SCENE_LOCATION_(sceneLocation), sceneCollection(new std::vector<SceneCollection*>),
+	shaderCollection(new std::vector<ShaderHandler*>), textureCollection(new std::vector<TextureHandler*>), GAME_H_(game) {
 
 	CAMERA = new FreeCamera(glm::radians(45.0f), GAME_H_->WINDOW_W_->Aspect());
 }
 
-void SceneHandler::Init(std::string* sceneLocation) {
-	SCENE_LOCATION_ = sceneLocation;
-
+void SceneHandler::Init() const {
 	CAMERA->Translate({0, 0, 5});
-
-	auto vert = *sceneLocation + "shaders/basic.vert";
-	auto frag = *sceneLocation + "shaders/basic.frag";
-
-	const auto objectsLocation = *sceneLocation + "objects/";
-
-	for (const auto& entry : std::filesystem::directory_iterator(objectsLocation)) {
-		auto location = entry.path().string();
-
-		const size_t last_slash_idx = location.find_last_of("\\/");
-		if (std::string::npos != last_slash_idx) {
-			if (location[last_slash_idx + 1] == '_') {
-				continue;
-			}
-		}
-
-		std::cout << "[LOADING]: " << location << std::endl;
-
-		auto* obj = new SceneCollection(this, &location);
-
-		obj->Init(&vert, &frag);
-
-		sceneCollection->push_back(obj);
-	}
+	resource->Load();
 }
 
 void SceneHandler::Draw() const {
@@ -56,19 +32,15 @@ void SceneHandler::CleanUp() {
 	delete sceneCollection;
 }
 
-bool dw  = false;
-bool da  = false;
-bool ds  = false;
-bool dd  = false;
 bool spd = false;
 
-void SceneHandler::GameLoop(float delta) {
-	auto speed = CAMERA_SPEED_ + (spd ? CAMERA_FAST_SPEED : CAMERA_DEFAULT_SPEED);
+void SceneHandler::GameLoop(float delta) const {
+	const auto speed = CAMERA_SPEED_ + (spd ? CAMERA_FAST_SPEED : CAMERA_DEFAULT_SPEED);
 
 	auto set = GAME_H_->WINDOW_W_->KEY_DOWN_SET_;
 	for (auto itr = set.begin(); itr != set.end(); ++itr) {
 		const auto key = *itr;
-		
+
 		switch (key) {
 			case SDLK_w:
 				CAMERA->MoveForward(delta * speed);
@@ -113,7 +85,7 @@ bool SceneHandler::KeyEvent(SDL_Keycode key, UInt16 mod, bool down) {
 		case SDLK_LSHIFT:
 			spd = down;
 			break;
-		
+
 		default:
 			break;
 	}

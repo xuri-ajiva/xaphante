@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClCompile Include="GameHandler.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
+    <ClCompile Include="ResourceLoader.cpp" />
     <ClCompile Include="SceneCollection.cpp" />
     <ClCompile Include="SceneHandler.cpp" />
     <ClCompile Include="xmain.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="GameHandler.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="ObjectHandler.h" />
+    <ClInclude Include="ResourceLoader.h" />
     <ClInclude Include="SceneCollection.h" />
     <ClInclude Include="SceneHandler.h" />
     <ClInclude Include="ShaderHandler.h" />
