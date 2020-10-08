@@ -10,4 +10,10 @@
       <PackageReference Include="AssimpNet" Version="4.1.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="glslcc.exe">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

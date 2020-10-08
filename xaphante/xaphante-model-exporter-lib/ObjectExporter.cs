@@ -1,138 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Assimp;
 using Assimp.Configs;
-using Matrix4x4 = Assimp.Matrix4x4;
-using ThreadState = System.Diagnostics.ThreadState;
 
 namespace xaphante_model_exporter_lib
 {
-    public class SceneDataExportable
+    public class ObjectExporter : IXaphanteExporter
     {
-        public List<Position> Positions = new List<Position>();
-        public List<UInt32>   Indices   = new List<UInt32>();
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct Position
-    {
-        public Vector3D pos;
-
-        public Vector3D normal;
-
-        public Position(Vector3D pos, Vector3D normal)
-        {
-            this.normal = normal;
-            this.pos    = pos;
-        }
-    }
-
-    public class Config <T>
-    {
-        public T   TX   { get; set; }
-        public int Size => Marshal.SizeOf<T>();
-    }
-
-    public class ProgressEvent
-    {
-        public double Percentage { get; }
-
-        public string Status { get; }
-
-        public ProgressEvent(double percentage, string status)
-        {
-            this.Percentage = percentage;
-            this.Status     = status;
-        }
-    }
-
-    public class Exporter
-    {
-        private readonly Action<ProgressEvent> statusCallback;
-        private          CancellationToken     token;
-
-        private ProgressEvent last = new ProgressEvent(0, "Initializing");
-
-        public Exporter(Action<ProgressEvent> statusCallback, CancellationToken token)
-        {
-            this.statusCallback = statusCallback;
-            this.token          = token;
-        }
-
-        void Update(string msg)
-        {
-            this.statusCallback?.Invoke(new ProgressEvent(this.last.Percentage, msg));
-        }
-
-        void UpdateAdd(int now, int max, string msg)
-        {
-            this.statusCallback?.Invoke(new ProgressEvent(now / (double) max, msg));
-        }
-
         public SceneDataExportable dataHolder = new SceneDataExportable();
 
-        private FileWriter writer;
+        /// <inheritdoc />
+        public void Init(Action<ProgressEvent> statusCallback, CancellationToken token) => ((IXaphanteExporter) this).InitTemplate(statusCallback, token);
+
+        /// <inheritdoc />
+        public void UpdateLast(string msg) => ((IXaphanteExporter) this).UpdateLastTemplate(msg);
+
+        /// <inheritdoc />
+        public void UpdateNew(string msg, int now, int max) => ((IXaphanteExporter) this).UpdateNewTemplate(msg, now, max);
+
+        /// <inheritdoc />
+        public ProgressEvent Last { get; set; }
+
+        /// <inheritdoc />
+        public Action<ProgressEvent> StatusCallback { get; set; }
+
+        /// <inheritdoc />
+        public CancellationToken Token { get; set; }
+
+        public FileWriter Writer { get; set; }
 
         public async Task<bool> Run(string importFile, string exportFile)
         {
             bool success = ImportScene(importFile);
             if (!success)
             {
-                UpdateAdd(1, 1, "Import Failed! Exiting...");
+                UpdateNew("Import Failed! Exiting...", 1, 1);
                 Thread.Sleep(300);
                 return false;
             }
 
-            this.token.ThrowIfCancellationRequested();
+            this.Token.ThrowIfCancellationRequested();
 
-            UpdateAdd(1, 1, "Waiting For Export...");
+            UpdateNew("Waiting For Export...", 1, 1);
 
-            this.writer = new FileWriter(exportFile, XaphanteFileType.ObjectFile);
+            this.Writer = new FileWriter(exportFile, XaphanteFileType.ObjectFile);
             Thread.Sleep(300);
 
-            this.token.ThrowIfCancellationRequested();
+            this.Token.ThrowIfCancellationRequested();
 
             success = await ExportToFile(exportFile);
 
             if (!success)
-                UpdateAdd(1, 1, "Export Failed! Exiting...");
+                UpdateNew("Export Failed! Exiting...", 1, 1);
 
             return success;
         }
 
         #region Export
 
-        Config<uint> config = new Config<uint>();
+        private readonly Config<uint> config = new Config<uint>();
 
         private async Task<bool> ExportToFile(string exportFile)
         {
-            UpdateAdd(0, 1, "Exporting To: " + exportFile);
+            UpdateNew("Exporting To: " + exportFile, 0, 1);
 
-            this.writer.Open();
+            this.Writer.Open();
 
-            this.writer.WriteHeader(ref this.token);
-            this.writer.Writer.Write(this.config.Size);
+            var cancellationToken = this.Token;
+            this.Writer.WriteHeader(ref cancellationToken);
+            this.Writer.Writer.Write(this.config.Size);
 
-            UpdateAdd(1, 100, "Writing Vertices...");
-            this.writer.WriteList(this.dataHolder.Positions, ref this.token);
+            UpdateNew("Writing Vertices...", 1, 100);
+            this.Writer.WriteList(this.dataHolder.Positions, ref cancellationToken);
 
-            this.token.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
-            UpdateAdd(1, 100, "Writing Indices...");
-            this.writer.WriteList(this.dataHolder.Indices, ref this.token);
+            UpdateNew("Writing Indices...", 1, 100);
+            this.Writer.WriteList(this.dataHolder.Indices, ref cancellationToken);
 
-            this.writer.Close();
+            this.Writer.Close();
 
-            UpdateAdd(1, 1, "Finished !");
+            UpdateNew("Finished !", 1, 1);
 
             return true;
         }
@@ -156,12 +107,12 @@ namespace xaphante_model_exporter_lib
                     }
                     catch (Exception e)
                     {
-                        Update(e.Message);
+                        UpdateLast(e.Message);
                     }
                 },
-                this.token);
+                this.Token);
 
-            UpdateAdd(0, 1, "Importing...");
+            UpdateNew("Importing...", 0, 1);
 
             int       i   = 0;
             const int max = 100;
@@ -169,31 +120,31 @@ namespace xaphante_model_exporter_lib
 
             while (!task.IsCompleted)
             {
-                UpdateAdd(i++ % max, max, "");
+                UpdateNew("", i++ % max, max);
                 Thread.Sleep(1 + (int) (r.NextDouble() * i % max / 10));
             }
 
             if (scene == null || (scene.SceneFlags & SceneFlags.Incomplete) != 0 || scene.RootNode == null)
             {
-                Update("Scene is Not Valid");
+                UpdateLast("Scene is Not Valid");
                 return false;
             }
 
             ProcessNode(scene.RootNode, scene, 0);
-            UpdateAdd(1, 1, "Finished Import!");
+            UpdateNew("Finished Import!", 1, 1);
             return true;
         }
 
         private void ProcessNode(Node node, Scene scene, int layer)
         {
-            this.token.ThrowIfCancellationRequested();
+            this.Token.ThrowIfCancellationRequested();
 
-            Update("Depth: " + layer);
+            UpdateLast("Depth: " + layer);
             ProcessData(node, scene);
 
             foreach (var children in node.Children)
             {
-                this.token.ThrowIfCancellationRequested();
+                this.Token.ThrowIfCancellationRequested();
 
                 ProcessNode(children, scene, layer + 1);
             }
@@ -204,13 +155,13 @@ namespace xaphante_model_exporter_lib
             foreach (int meshIndex in node.MeshIndices)
             {
                 ProcessMesh(scene.Meshes[meshIndex], scene);
-                UpdateAdd(meshIndex, scene.MeshCount, "Processing...");
+                UpdateNew("Processing...", meshIndex, scene.MeshCount);
             }
         }
 
         private void ProcessMesh(Mesh sceneMesh, Scene scene)
         {
-            this.token.ThrowIfCancellationRequested();
+            this.Token.ThrowIfCancellationRequested();
             this.dataHolder.Positions.AddRange(GenVertices(sceneMesh));
             this.dataHolder.Indices.AddRange(sceneMesh.GetUnsignedIndices());
 
@@ -223,7 +174,7 @@ namespace xaphante_model_exporter_lib
             //    }
             //}
 
-            Update("Processed");
+            UpdateLast("Processed");
         }
 
         private IEnumerable<Position> GenVertices(Mesh sceneMesh)

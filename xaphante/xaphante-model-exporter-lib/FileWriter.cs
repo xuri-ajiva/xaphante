@@ -8,11 +8,6 @@ using ThreadState = System.Diagnostics.ThreadState;
 
 namespace xaphante_model_exporter_lib
 {
-    public enum XaphanteFileType
-    {
-        ObjectFile, ShaderProgram, TextureFile,
-    }
-
     public class FileWriter
     {
         public static string XaphanteFileTypeName(XaphanteFileType type) =>
@@ -22,7 +17,14 @@ namespace xaphante_model_exporter_lib
                 XaphanteFileType.TextureFile   => "BTXF",
                 _                              => "BUKF"
             };
-
+        public static string XaphanteFileExtensionName(XaphanteFileType type) =>
+            type switch {
+                XaphanteFileType.ObjectFile    => ".bobf",
+                XaphanteFileType.ShaderProgram => ".bspf",
+                XaphanteFileType.TextureFile   => ".btxf",
+                _                              => ".bukf"
+            }; 
+        
         public static event Action<double> UpdateStatus;
         public static event Action<string> Infos;
 
@@ -114,5 +116,7 @@ namespace xaphante_model_exporter_lib
             this.Writer.Write(ls);
             this.Writer.Write(arr);
         }
+
+
     }
 }
