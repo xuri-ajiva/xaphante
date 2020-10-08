@@ -1,19 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using xaphante_model_exporter_lib;
 using Path = System.IO.Path;
@@ -26,6 +17,8 @@ namespace xaphante_model_exporter_interface
     public partial class MainWindow : Window
     {
         private const string EXTENSION = ".bsf";
+
+        Dictionary<XaphanteFileType, Action> Progresses = new Dictionary<XaphanteFileType, Action>();
 
         public MainWindow()
         {
@@ -43,40 +36,130 @@ namespace xaphante_model_exporter_interface
                     this.status.ScrollToEnd();
                 });
             };
+
             FileWriter.UpdateStatus += delegate(double d) {
                 this.Dispatcher?.Invoke(() => {
                     this.progBar2.Value = d * this.progBar2.Maximum;
                 });
             };
+
+            foreach (string name in Enum.GetNames(typeof(XaphanteFileType)))
+            {
+                var g = new StackPanel {
+                    Margin     = new Thickness(0, 0, 0, 0),
+                    Background = null,
+                };
+
+                switch (Enum.Parse<XaphanteFileType>(name))
+                {
+                    case XaphanteFileType.ObjectFile: {
+                        var o1 = new OutputFileControl { EXTENSION = FileWriter.XaphanteFileExtensionName(XaphanteFileType.ObjectFile) };
+                        var i1 = new InputFileControl();
+                        i1.OnOpen += path => {
+                            o1.outputLBox.Text = Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path) + o1.EXTENSION);
+                        };
+
+                        g.Children.Add(i1);
+                        g.Children.Add(o1);
+
+                        this.Progresses.Add(XaphanteFileType.ObjectFile,
+                            () => {
+                                string inf = i1.inputLBox.Text;
+                                string exf = o1.outputLBox.Text;
+                                this.CancellationTokenMy = new CancellationTokenSource();
+                                this.MainThread = new Thread(async () => {
+                                    var exp = new ObjectExporter();
+                                    exp.Init(StatusCallback, this.CancellationTokenMy.Token);
+
+                                    try
+                                    {
+                                        await exp.Run(inf, exf);
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        StatusCallback(new ProgressEvent(1, exception.Message));
+                                        StatusCallback(new ProgressEvent(1, exception.StackTrace));
+                                    }
+                                });
+                            });
+                    }
+
+                        break;
+                    case XaphanteFileType.ShaderProgram: {
+                        var o1 = new OutputFileControl { EXTENSION = FileWriter.XaphanteFileExtensionName(XaphanteFileType.ShaderProgram) };
+                        var i1 = new InputFileControl();
+                        var i2 = new InputFileControl();
+
+                        i1.OnOpen += path => {
+                            o1.outputLBox.Text = Path.Combine(Path.GetDirectoryName(path)!, Path.GetFileNameWithoutExtension(path) + o1.EXTENSION);
+                            string fag = Path.Combine(Path.GetDirectoryName(path)!, Path.GetFileNameWithoutExtension(path) + ".frag");
+                            if (File.Exists(fag))
+                            {
+                                i2.inputLBox.Text = fag;
+                            }
+                        };
+
+                        g.Children.Add(i1);
+                        g.Children.Add(i2);
+                        g.Children.Add(o1);
+
+                        this.Progresses.Add(XaphanteFileType.ShaderProgram,
+                            () => {
+                                var vert = i1.inputLBox.Text;
+                                var frag = i2.inputLBox.Text;
+                                var outf = o1.outputLBox.Text;
+
+                                this.CancellationTokenMy = new CancellationTokenSource();
+                                this.MainThread = new Thread(async () => {
+                                    var exp = new ShaderExporter();
+                                    exp.Init(StatusCallback, this.CancellationTokenMy.Token);
+
+                                    try
+                                    {
+                                        await exp.Run(vert, frag, new ShaderDescription[] { }, outf);
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        StatusCallback(new ProgressEvent(1, exception.Message));
+                                        StatusCallback(new ProgressEvent(1, exception.StackTrace));
+                                    }
+                                });
+                            });
+                    }
+
+                        break;
+                    case XaphanteFileType.TextureFile: break;
+                    default:                           throw new ArgumentOutOfRangeException();
+                }
+
+                var newTabItem = new TabItem {
+                    Header          = name,
+                    Name            = name,
+                    Content         = g,
+                    Background      = null,
+                    Foreground      = this.progButton.Foreground,
+                    BorderBrush     = this.progButton.BorderBrush,
+                    BorderThickness = this.progButton.BorderThickness,
+                };
+
+                tabControl.Items.Add(newTabItem);
+            }
         }
 
         private void Progress(object sender, RoutedEventArgs e)
         {
-            var inf = this.inputLBox.Text;
-            var exf = this.outputLBox.Text;
-
             if (this.MainThread != null && this.MainThread.IsAlive)
             {
                 MessageBox.Show("Already Inprogress!");
                 return;
             }
 
-            CancellationTokenMy = new CancellationTokenSource();
-            this.MainThread = new Thread(async () => {
-                var exp = new Exporter(StatusCallback, this.CancellationTokenMy.Token);
+            if (this.tabControl.SelectedItem is TabItem ti)
+            {
+                this.Progresses[Enum.Parse<XaphanteFileType>(ti.Name)]?.Invoke();
+            }
 
-                try
-                {
-                    await exp.Run(inf, exf);
-                }
-                catch (Exception exception)
-                {
-                    StatusCallback(new ProgressEvent(1, exception.Message));
-                    StatusCallback(new ProgressEvent(1, exception.StackTrace));
-                }
-            });
-
-            this.MainThread.Start();
+            this.MainThread?.Start();
         }
 
         public CancellationTokenSource CancellationTokenMy { get; set; }
@@ -100,25 +183,6 @@ namespace xaphante_model_exporter_interface
             });
         }
 
-        private void OpenInput(object sender, RoutedEventArgs e)
-        {
-            var of = new OpenFileDialog();
-            if (of.ShowDialog() != true)
-                return;
-
-            this.inputLBox.Text  = of.FileName;
-            this.outputLBox.Text = Path.Combine(Path.GetDirectoryName(of.FileName), Path.GetFileNameWithoutExtension(of.FileName) + EXTENSION);
-        }
-
-        private void OpenOutput(object senOpenOutputEventArgs, RoutedEventArgs e)
-        {
-            var sf = new SaveFileDialog { DefaultExt = EXTENSION, AddExtension = true };
-            if (sf.ShowDialog() != true)
-                return;
-
-            this.outputLBox.Text = sf.FileName;
-        }
-
         private void Abort(object sender, RoutedEventArgs e)
         {
             if (this.MainThread == null)
@@ -129,26 +193,6 @@ namespace xaphante_model_exporter_interface
             {
                 this.CancellationTokenMy?.Cancel();
             }
-        }
-
-        private void ShowInput(object sender, RoutedEventArgs e)
-        {
-            ExplorerShow(this.inputLBox.Text);
-        }
-
-        private void ShowOutput(object sender, RoutedEventArgs e)
-        {
-            ExplorerShow(this.outputLBox.Text);
-        }
-
-        void ExplorerShow(string p)
-        {
-            string args = string.Format("/e, /select, \"{0}\"", p);
-
-            ProcessStartInfo info = new ProcessStartInfo();
-            info.FileName  = "explorer";
-            info.Arguments = args;
-            Process.Start(info);
         }
     }
 }
