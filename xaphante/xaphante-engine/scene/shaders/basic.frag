@@ -1,12 +1,12 @@
-#version 330 core
+#version 450 core
 
 layout(location = 0) out vec4 f_color;
 
 uniform vec4 u_color;
 uniform sampler2D u_texture;
 
-in vec3 v_position;
-in vec3 v_normal;
+layout(location = 0) in vec3 v_normal;
+layout(location = 1) in vec3 v_position;
 
 
 void main()
