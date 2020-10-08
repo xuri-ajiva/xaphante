@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="xaphante_model_exporter_interface.OutputFileControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:xaphante_model_exporter_interface"
+             mc:Ignorable="d" d:DesignWidth="800" Height="45">
+    <Grid>
+        <Button Content="Select" Margin="0,10,72,10" Click="OpenOutput" FontWeight="Normal" Background="{x:Null}" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False" BorderThickness="1,1,1,1" HorizontalAlignment="Right" Width="57"/>
+        <TextBox x:Name="outputLBox" Margin="64,10,131,10" Text="" TextWrapping="Wrap" FontWeight="Normal" TextAlignment="Justify" Background="{x:Null}" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False"/>
+        <Label Content="Output" HorizontalAlignment="Left" Width="49" Margin="10,10,0,10" FontWeight="Normal" Background="{x:Null}" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="4,3,5,1" UseLayoutRounding="False"/>
+        <Button Content="Show" Margin="0,10,10,10" Click="ShowOutput" FontWeight="Normal" Background="{x:Null}" Foreground="#FFFF7400" BorderBrush="#FF005DFF" Padding="1,1,1,1" UseLayoutRounding="False" BorderThickness="1,1,1,1" HorizontalAlignment="Right" Width="57"/>
+
+    </Grid>
+</UserControl>
